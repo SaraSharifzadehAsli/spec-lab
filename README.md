@@ -1,3 +1,5 @@
+**[Live page →](https://sarasharifzadehasli.github.io/spec-lab/)**
+
 # spec-lab
 
 One small function — merging overlapping time blocks — with a specification
@@ -5,7 +7,11 @@ written as properties, and a mutation score that measures whether the tests
 would actually notice if the function were wrong.
 
 ```ts
-mergeIntervals([[1, 3], [2, 6], [8, 10]])  //  [[1, 6], [8, 10]]
+mergeIntervals([
+  [1, 3],
+  [2, 6],
+  [8, 10],
+]); //  [[1, 6], [8, 10]]
 ```
 
 The function is deliberately small. It is the thing being tested, not the
@@ -26,7 +32,7 @@ An example test checks one input. You pick it, so it only covers the mistakes
 you already thought of.
 
 `src/examples.ts` holds three of them — an obvious overlap, an out-of-order
-pair, the empty list — and they are deliberately *not* aimed at the five broken
+pair, the empty list — and they are deliberately _not_ aimed at the five broken
 versions in `mutation/`. An earlier draft had seven examples, one per mistake,
 written after the mistakes were known. That scores beautifully and measures
 nothing: real examples are written before anyone knows what will break, and
@@ -36,7 +42,7 @@ Under closed endpoints those three examples kill 1 of the 5 broken versions.
 The properties kill 5.
 
 A property works the other way round. Instead of naming an input, you state a
-rule the answer must obey for *every* input, and a generator hunts for an input
+rule the answer must obey for _every_ input, and a generator hunts for an input
 that breaks it. When it finds one it **shrinks** it: drop one block, re-check,
 and if it still fails keep the smaller input. What survives is the smallest
 input that still breaks the rule, which is the one worth reading.
@@ -45,13 +51,13 @@ input that still breaks the rule, which is the one worth reading.
 
 Five rules, in [`src/spec.ts`](src/spec.ts):
 
-| | rule | what it catches |
-| --- | --- | --- |
-| **P1** | no moment belongs to two blocks | the merge test failing to fire |
-| **P2** | the output is sorted by start | **nothing — see below** |
-| **P3** | blocks that meet at a point are one block | M1, but only under `[a, b)` |
-| **P4** | the output loses no covered time | a block dropped or shortened |
-| **P5** | the output invents no time | a real gap bridged |
+|        | rule                                      | what it catches                |
+| ------ | ----------------------------------------- | ------------------------------ |
+| **P1** | no moment belongs to two blocks           | the merge test failing to fire |
+| **P2** | the output is sorted by start             | **nothing — see below**        |
+| **P3** | blocks that meet at a point are one block | M1, but only under `[a, b)`    |
+| **P4** | the output loses no covered time          | a block dropped or shortened   |
+| **P5** | the output invents no time                | a real gap bridged             |
 
 P4 and P5 are mirrors of each other and together they pin the answer down: one
 says nothing may be lost, the other says nothing may be added. Each walks a
@@ -121,10 +127,10 @@ M5  (nothing)                      →  list = list.filter(([s, e]) => e > s)
 npm run mutate
 ```
 
-| convention | 3 examples | P1, P2, P4, P5 | with P3 on |
-| --- | --- | --- | --- |
-| `[a, b]` closed | 1/5 | **5/5** | 5/5 — P3 adds nothing |
-| `[a, b)` half-open | 1/5 | 3/5 | 4/5 — P3 kills M1 |
+| convention         | 3 examples | P1, P2, P4, P5 | with P3 on            |
+| ------------------ | ---------- | -------------- | --------------------- |
+| `[a, b]` closed    | 1/5        | **5/5**        | 5/5 — P3 adds nothing |
+| `[a, b)` half-open | 1/5        | 3/5            | 4/5 — P3 kills M1     |
 
 The score is the least interesting line. These are the rest:
 

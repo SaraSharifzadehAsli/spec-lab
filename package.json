@@ -11,9 +11,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "mutate": "tsx mutation/score.ts",
+    "llm:score": "tsx llm/score.ts",
+    "llm:stryker": "tsx llm/stryker.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@stryker-mutator/core": "^10.0.0",
+    "@stryker-mutator/vitest-runner": "^10.0.0",
     "@types/node": "^22.10.2",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",

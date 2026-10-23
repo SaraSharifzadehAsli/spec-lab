@@ -13,6 +13,10 @@
     "mutate": "tsx mutation/score.ts",
     "llm:score": "tsx llm/score.ts",
     "llm:stryker": "tsx llm/stryker.ts",
+    "llm:prepare": "tsx llm/prepare.ts",
+    "llm:run-bugged": "tsx llm/run-bugged.ts",
+    "llm:collect": "tsx llm/collect.ts",
+    "llm:bugged": "tsx llm/bugged-score.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

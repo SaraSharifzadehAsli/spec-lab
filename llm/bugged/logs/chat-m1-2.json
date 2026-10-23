@@ -1,0 +1,145 @@
+{
+  "started": "2026-10-23T18:16:12.681Z",
+  "cwd": "/var/folders/m2/ksbv0r6908v8nxdd88f34h0c0000gn/T/llm-chat-m1-2",
+  "duration_api_ms": 17543,
+  "stop_reason": "end_turn",
+  "session_id": "0857df2d-6a53-406d-bdb2-c67cff023e57",
+  "total_cost_usd": 0.0636174,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 2810,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 2037,
+    "output_tokens_details": {
+      "thinking_tokens": 362
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 2810,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 2037,
+        "cache_read_input_tokens": 649,
+        "cache_creation_input_tokens": 2810,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2810
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 1556,
+      "outputTokens": 208,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0002596,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 188,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    },
+    "claude-opus-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 2037,
+      "cacheReadInputTokens": 649,
+      "cacheCreationInputTokens": 2810,
+      "webSearchRequests": 0,
+      "costUSD": 0.0633578,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 362,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "```ts\nimport { describe, it, expect } from \"vitest\";\nimport { mergeIntervals } from \"../../src/intervals\";\n\ndescribe(\"mergeIntervals\", () => {\n  it(\"returns an empty array for empty input\", () => {\n    expect(mergeIntervals([])).toEqual([]);\n  });\n\n  it(\"returns a single interval unchanged\", () => {\n    expect(mergeIntervals([[1, 3]])).toEqual([[1, 3]]);\n  });\n\n  it(\"keeps disjoint intervals separate\", () => {\n    expect(\n      mergeIntervals([\n        [1, 2],\n        [4, 5],\n        [7, 9],\n      ]),\n    ).toEqual([\n      [1, 2],\n      [4, 5],\n      [7, 9],\n    ]);\n  });\n\n  it(\"merges overlapping intervals\", () => {\n    expect(\n      mergeIntervals([\n        [1, 4],\n        [2, 6],\n      ]),\n    ).toEqual([[1, 6]]);\n  });\n\n  // NOTE: the docs say touching blocks merge, but the implementation uses\n  // `start < last[1]` instead of `start <= last[1]`, so the touching cases\n  // below fail against the current code.\n  it(\"merges intervals that touch at an endpoint\", () => {\n    expect(\n      mergeIntervals([\n        [1, 3],\n        [3, 5],\n      ]),\n    ).toEqual([[1, 5]]);\n  });\n\n  it(\"merges a zero-length interval touching the end of another\", () => {\n    expect(\n      mergeIntervals([\n        [1, 3],\n        [3, 3],\n      ]),\n    ).toEqual([[1, 3]]);\n  });\n\n  it(\"merges a chain of touching intervals\", () => {\n    expect(\n      mergeIntervals([\n        [0, 1],\n        [1, 2],\n        [2, 3],\n      ]),\n    ).toEqual([[0, 3]]);\n  });\n\n  it(\"absorbs intervals fully contained in another\", () => {\n    expect(\n      mergeIntervals([\n        [1, 10],\n        [2, 3],\n        [4, 5],\n      ]),\n    ).toEqual([[1, 10]]);\n  });\n\n  it(\"does not shrink the end when a later interval ends earlier\", () => {\n    expect(\n      mergeIntervals([\n        [1, 10],\n        [2, 4],\n        [9, 12],\n      ]),\n    ).toEqual([[1, 12]]);\n  });\n\n  it(\"sorts unsorted input before merging\", () => {\n    expect(\n      mergeIntervals([\n        [8, 10],\n        [1, 3],\n        [2, 4],\n        [15, 18],\n      ]),\n    ).toEqual([\n      [1, 4],\n      [8, 10],\n      [15, 18],\n    ]);\n  });\n\n  it(\"merges intervals that share a start\", () => {\n    expect(\n      mergeIntervals([\n        [1, 2],\n        [1, 5],\n      ]),\n    ).toEqual([[1, 5]]);\n  });\n\n  it(\"merges an interval that bridges two earlier gaps\", () => {\n    expect(\n      mergeIntervals([\n        [1, 2],\n        [5, 6],\n        [1.5, 5.5],\n      ]),\n    ).toEqual([[1, 6]]);\n  });\n\n  it(\"handles negative numbers\", () => {\n    expect(\n      mergeIntervals([\n        [-5, -2],\n        [-3, 0],\n        [2, 4],\n      ]),\n    ).toEqual([\n      [-5, 0],\n      [2, 4],\n    ]);\n  });\n\n  it(\"handles zero-length intervals that do not touch anything\", () => {\n    expect(\n      mergeIntervals([\n        [5, 5],\n        [1, 1],\n      ]),\n    ).toEqual([\n      [1, 1],\n      [5, 5],\n    ]);\n  });\n\n  it(\"does not mutate the input array or its intervals\", () => {\n    const input: [number, number][] = [\n      [5, 8],\n      [1, 3],\n      [2, 6],\n    ];\n    const snapshot = input.map((iv) => [...iv]);\n\n    mergeIntervals(input);\n\n    expect(input).toEqual(snapshot);\n  });\n\n  it(\"returns intervals that are not the same objects as the input\", () => {\n    const a: [number, number] = [1, 3];\n    const result = mergeIntervals([a]);\n\n    expect(result[0]).not.toBe(a);\n  });\n\n  it(\"produces sorted output with no touching or overlapping blocks\", () => {\n    const result = mergeIntervals([\n      [20, 25],\n      [3, 7],\n      [1, 3],\n      [10, 12],\n      [6, 9],\n      [12, 14],\n      [30, 30],\n    ]);\n\n    for (let i = 1; i < result.length; i++) {\n      expect(result[i][0]).toBeGreaterThan(result[i - 1][1]);\n    }\n    for (const [start, end] of result) {\n      expect(start).toBeLessThanOrEqual(end);\n    }\n  });\n});\n```",
+  "ttft_ms": 5279,
+  "type": "result",
+  "duration_ms": 16123,
+  "uuid": "12af438c-f402-4b79-a237-3b86166d3a7d",
+  "ttft_stream_ms": 2135,
+  "time_to_request_ms": 21,
+  "time_to_request_phases_ms": {
+    "other": 4,
+    "system_prompt": 6,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 2,
+    "input_hooks": 1,
+    "tool_pool_refresh": 0,
+    "init_message": 2,
+    "engine_pickup": 0,
+    "message_prep": 0,
+    "model_config_wait": 1,
+    "autocompact": 0,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 1,
+    "message_normalization": 0,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 0,
+  "time_to_request_cpu_ms": 38,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "queued_commands",
+    "slowest_producer_ms": 1,
+    "cpu_ms": 3,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 2136,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

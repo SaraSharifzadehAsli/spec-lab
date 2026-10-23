@@ -194,6 +194,46 @@ Limits: one small function, 26 mutants, five runs per model, a free model
 (ChatGPT, default) against a paid one (Claude Opus 5.5), and both models saw
 the source code.
 
+## Tests for code that already has a bug
+
+The same question turned around: give a model code that already contains a bug,
+with the doc comment unchanged, and see whether its tests catch the bug or
+expect it. The function was given with M1 (blocks that touch are left apart)
+or with M4 (blocks one unit apart are merged). Two groups, the same model
+(Claude Opus 5.5, effort medium), five runs per group and bug, all made by
+`npm run llm:run-bugged` ([`llm/bugged/runs.md`](llm/bugged/runs.md)):
+
+- **chat**: no tools. It reads the code and replies with a test file.
+- **agent**: Claude Code in a folder that holds only the buggy code. It can run
+  its tests.
+
+| group | bug | tests catch it | tests expect it | tests miss it | message says it may be a bug |
+| ----- | --- | -------------- | --------------- | ------------- | ---------------------------- |
+| chat  | M1  | 5 of 5         | 0               | 0             | 0 of 5 (code only)           |
+| chat  | M4  | 0              | 5 of 5 \*       | 0             | 0 of 5 (code only)           |
+| agent | M1  | 5 of 5         | 0               | 0             | 5 of 5                       |
+| agent | M4  | 1 of 5         | 0               | 4 of 5        | 5 of 5                       |
+
+\* One of the five also has a second wrong expectation, so it fails on both
+versions.
+
+What I take from it:
+
+- M1 breaks the doc comment's own word, "touches", and every run caught it.
+- M4 is the interesting one. Reading the code, the chat model decided that
+  "touching" means whole-number neighbours, so `[1, 2]` and `[3, 4]` touch, and
+  in all five runs it wrote tests that expect the bug, without a word of doubt.
+- The agent ran its tests, and in all five runs its last message said the
+  `+ 1` may be a bug and asked which reading was meant. But four of the five
+  then left that case untested, so their test files miss the bug. The doubt
+  is in the message, not in the tests.
+- So a test file and the reasoning behind it can disagree. Judged by its test
+  file alone, the agent was no better than the chat at M4. Judged by what it
+  said, it was the only one that noticed.
+
+Limits: one function, two bugs, five runs per group, one model. M4 is correct
+if blocks are whole-number slots, which is why it splits the models.
+
 ## Layout
 
 ```
@@ -210,6 +250,12 @@ llm/runs.md                       model, settings and date of every run
 llm/generated/                    the ten generated test files
 llm/score.ts                      the hand-written mutants against every suite
 llm/stryker.ts                    Stryker's mutants against every suite
+llm/bugged.ts                     the two buggy versions and shared settings
+llm/prepare.ts                    the chat prompts and the empty agent folders
+llm/run-bugged.ts                 the twenty runs on buggy code
+llm/collect.ts                    copies the agents' test files into llm/bugged/
+llm/bugged-score.ts               caught, expected or missed, per file
+llm/bugged/                       prompts, test files, runs.md and the logs of every run
 web/lab.ts                        the page's own generator and shrinker
 web/App.tsx                       the six steps
 web/Ruler.tsx                     a counterexample, drawn
@@ -236,6 +282,10 @@ npm test        # vitest: 3 examples + 5 properties × 2 conventions
 npm run mutate  # the mutation report
 npm run llm:score    # the five hand-written mutants against every suite
 npm run llm:stryker  # Stryker's mutants against every suite
+npm run llm:prepare     # chat prompts and agent folders for the buggy-code runs
+npm run llm:run-bugged  # the twenty runs (needs Claude Code)
+npm run llm:collect     # copy the agents' test files here
+npm run llm:bugged      # score them
 npm run dev     # the page, at localhost:5173
 npm run build   # a static build in dist/
 npm run typecheck

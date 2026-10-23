@@ -1,0 +1,145 @@
+{
+  "started": "2026-10-23T18:16:56.032Z",
+  "cwd": "/var/folders/m2/ksbv0r6908v8nxdd88f34h0c0000gn/T/llm-chat-m1-5",
+  "duration_api_ms": 16828,
+  "stop_reason": "end_turn",
+  "session_id": "b5e61583-5631-4ece-95d5-7fe8bf1344c5",
+  "total_cost_usd": 0.060998399999999994,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 2812,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 1910,
+    "output_tokens_details": {
+      "thinking_tokens": 344
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 2812,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1910,
+        "cache_read_input_tokens": 649,
+        "cache_creation_input_tokens": 2812,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2812
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 1556,
+      "outputTokens": 18,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.00016460000000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    },
+    "claude-opus-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1910,
+      "cacheReadInputTokens": 649,
+      "cacheCreationInputTokens": 2812,
+      "webSearchRequests": 0,
+      "costUSD": 0.06083379999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 344,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "```ts\nimport { describe, it, expect } from \"vitest\";\nimport { mergeIntervals, type Interval } from \"../../src/intervals\";\n\ndescribe(\"mergeIntervals\", () => {\n  it(\"returns an empty array for empty input\", () => {\n    expect(mergeIntervals([])).toEqual([]);\n  });\n\n  it(\"returns a single interval unchanged\", () => {\n    expect(mergeIntervals([[1, 3]])).toEqual([[1, 3]]);\n  });\n\n  it(\"keeps disjoint intervals separate and sorts them by start\", () => {\n    expect(\n      mergeIntervals([\n        [8, 10],\n        [1, 2],\n        [4, 6],\n      ]),\n    ).toEqual([\n      [1, 2],\n      [4, 6],\n      [8, 10],\n    ]);\n  });\n\n  it(\"merges overlapping intervals\", () => {\n    expect(\n      mergeIntervals([\n        [1, 4],\n        [3, 6],\n      ]),\n    ).toEqual([[1, 6]]);\n  });\n\n  it(\"merges a chain of overlapping intervals into one\", () => {\n    expect(\n      mergeIntervals([\n        [5, 8],\n        [1, 3],\n        [2, 6],\n        [7, 9],\n      ]),\n    ).toEqual([[1, 9]]);\n  });\n\n  it(\"absorbs an interval fully contained in another\", () => {\n    expect(\n      mergeIntervals([\n        [1, 10],\n        [2, 3],\n        [4, 5],\n      ]),\n    ).toEqual([[1, 10]]);\n  });\n\n  it(\"merges intervals sharing the same start regardless of order\", () => {\n    expect(\n      mergeIntervals([\n        [1, 2],\n        [1, 5],\n      ]),\n    ).toEqual([[1, 5]]);\n    expect(\n      mergeIntervals([\n        [1, 5],\n        [1, 2],\n      ]),\n    ).toEqual([[1, 5]]);\n  });\n\n  // The doc comment says blocks that *touch* are merged. The current\n  // implementation compares with `start < last[1]` rather than `<=`,\n  // so these two tests are expected to fail until that is fixed.\n  it(\"merges intervals that touch at an endpoint\", () => {\n    expect(\n      mergeIntervals([\n        [1, 3],\n        [3, 5],\n      ]),\n    ).toEqual([[1, 5]]);\n  });\n\n  it(\"merges a zero-length interval touching another interval\", () => {\n    expect(\n      mergeIntervals([\n        [3, 3],\n        [1, 3],\n      ]),\n    ).toEqual([[1, 3]]);\n    expect(\n      mergeIntervals([\n        [1, 1],\n        [1, 4],\n      ]),\n    ).toEqual([[1, 4]]);\n  });\n\n  it(\"handles negative numbers\", () => {\n    expect(\n      mergeIntervals([\n        [-5, -2],\n        [-3, 0],\n        [2, 4],\n      ]),\n    ).toEqual([\n      [-5, 0],\n      [2, 4],\n    ]);\n  });\n\n  it(\"does not mutate the input array or its intervals\", () => {\n    const a: Interval = [4, 6];\n    const b: Interval = [1, 5];\n    const input: Interval[] = [a, b];\n\n    mergeIntervals(input);\n\n    expect(input).toEqual([\n      [4, 6],\n      [1, 5],\n    ]);\n    expect(input[0]).toBe(a);\n    expect(input[1]).toBe(b);\n  });\n\n  it(\"returns new interval objects rather than input references\", () => {\n    const iv: Interval = [1, 2];\n    const result = mergeIntervals([iv]);\n    expect(result[0]).toEqual([1, 2]);\n    expect(result[0]).not.toBe(iv);\n  });\n\n  it(\"produces sorted output with no touching or overlapping blocks\", () => {\n    const input: Interval[] = [\n      [10, 12],\n      [0, 1],\n      [2, 4],\n      [4, 7],\n      [11, 15],\n      [20, 20],\n      [6, 8],\n      [16, 18],\n    ];\n    const result = mergeIntervals(input);\n\n    for (let i = 1; i < result.length; i++) {\n      expect(result[i][0]).toBeGreaterThan(result[i - 1][1]);\n    }\n    for (const [start, end] of result) {\n      expect(start).toBeLessThanOrEqual(end);\n    }\n    // Every input interval is covered by some output interval.\n    for (const [s, e] of input) {\n      expect(result.some(([rs, re]) => rs <= s && e <= re)).toBe(true);\n    }\n  });\n});\n```",
+  "ttft_ms": 5604,
+  "type": "result",
+  "duration_ms": 15799,
+  "uuid": "b6582ff0-24b2-4c50-9233-257c078ea8fd",
+  "ttft_stream_ms": 2141,
+  "time_to_request_ms": 112,
+  "time_to_request_phases_ms": {
+    "other": 5,
+    "system_prompt": 8,
+    "resume_other": 1,
+    "process_user_input": 1,
+    "input_attachments": 2,
+    "input_hooks": 1,
+    "tool_pool_refresh": 1,
+    "init_message": 2,
+    "engine_pickup": 0,
+    "message_prep": 0,
+    "model_config_wait": 1,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 80,
+    "tool_schema_build": 3,
+    "message_normalization": 1,
+    "client_creation": 3,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 12,
+  "time_to_request_cpu_ms": 61,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "queued_commands",
+    "slowest_producer_ms": 1,
+    "cpu_ms": 5,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 2141,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

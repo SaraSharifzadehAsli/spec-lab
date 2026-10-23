@@ -25,6 +25,6 @@ export default defineConfig({
   ],
   test: {
     globals: true,
-    include: ["src/*.test.ts", "llm/generated/*.test.ts"],
+    include: ["src/*.test.ts", "llm/generated/*.test.ts", "llm/bugged/*.test.ts"],
   },
 });

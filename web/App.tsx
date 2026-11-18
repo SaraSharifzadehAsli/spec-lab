@@ -1,5 +1,5 @@
 /**
- * Spec Lab — the page.
+ * Spec Lab: the page.
  *
  * Six steps, in the order the idea was worked out: the function, the examples
  * anyone would write, properties instead of examples, scoring both suites
@@ -8,7 +8,7 @@
  *
  * Everything on the page is a live run of the repository's own modules. The
  * specification is `src/spec.ts`, the broken versions are `mutation/mutants.ts`
- * and the examples are `src/examples.ts` — the same ones `npm test` and
+ * and the examples are `src/examples.ts`, the same ones `npm test` and
  * `npm run mutate` use. Change a rule and this page changes with it.
  */
 
@@ -136,14 +136,14 @@ export function App() {
       setSummary(
         <>
           <strong>{choice.label}</strong>
-          {broken && <span className="mono"> — edit: {choice.edit}</span>}
+          {broken && <span className="mono"> (edit: {choice.edit})</span>}
           <br />
           All {active.length} active properties held across {cases} generated
           inputs.
           {broken && (
             <>
               {" "}
-              This broken version <strong>survived</strong> — the specification
+              This broken version <strong>survived</strong>. The specification
               has a gap, not the code.
             </>
           )}
@@ -165,7 +165,7 @@ export function App() {
     setSummary(
       <>
         <strong>{choice.label}</strong>
-        {broken && <span className="mono"> — edit: {choice.edit}</span>}
+        {broken && <span className="mono"> (edit: {choice.edit})</span>}
         <br />
         <strong>{firstBad.name}</strong> was violated on generated input #
         {firstBad.failure.index + 1}.
@@ -262,8 +262,8 @@ export function App() {
           <h2>The function</h2>
         </div>
         <p className="note">
-          <code>mergeIntervals</code> takes a list of time ranges — shifts,
-          meetings, machine bookings — and merges the ones that touch or
+          <code>mergeIntervals</code> takes a list of time ranges (shifts,
+          meetings, machine bookings) and merges the ones that touch or
           overlap. Integer endpoints, <code>start ≤ end</code>.
         </p>
         <pre>
@@ -320,8 +320,8 @@ export function App() {
           </table>
         </div>
         <p className="note">
-          All {examples.length} pass. The catch: they only check cases I thought
-          of while writing them — and they were written before anyone knew what
+          All {examples.length} pass. The catch: they only check cases someone thought
+          of while writing them, and they were written before anyone knew what
           would break, which is the only honest way to write them.
         </p>
       </section>
@@ -334,7 +334,7 @@ export function App() {
         </div>
         <p className="note">
           A property is a rule that must hold for <em>every</em> input, so a
-          generator can hunt for violations instead of me guessing. Switch the
+          generator can hunt for violations instead of someone guessing. Switch the
           implementation to a broken one and watch which rules catch it.
         </p>
 
@@ -345,8 +345,8 @@ export function App() {
               value={endpoints}
               onChange={(e) => changeEndpoints(e.target.value as Endpoints)}
             >
-              <option value="closed">end included — [a,b]</option>
-              <option value="half-open">end excluded — [a,b)</option>
+              <option value="closed">end included, [a,b]</option>
+              <option value="half-open">end excluded, [a,b)</option>
             </select>
           </label>
           <label className="field">
@@ -459,7 +459,7 @@ export function App() {
         </div>
         <p className="note">
           Mutation testing asks the question the other way round. Make five
-          small edits to the working code — each one a plausible slip — then run
+          small edits to the working code, each one a plausible slip, then run
           each suite against each broken version. A mutant the suite notices is{" "}
           <em>killed</em>. One it misses <em>survived</em>, and every survivor
           is a gap in the specification.
@@ -550,7 +550,7 @@ export function App() {
           <strong>
             End included, <code>[a,b]</code>.
           </strong>{" "}
-          The moment 3 belongs to both blocks, so they really do overlap — and
+          The moment 3 belongs to both blocks, so they really do overlap, and
           "no shared moments" has to be tested as{" "}
           <code>next.start &gt; last.end</code>. <code>M1</code> is then caught
           by <code>P1</code> on its own, and <code>P3</code> adds nothing.
@@ -562,12 +562,12 @@ export function App() {
           The moment 3 belongs only to the second block. The blocks share
           nothing; they merely meet. So <code>P1</code> holds, <code>M1</code>{" "}
           survives it, and catching <code>M1</code> needs a genuinely different
-          requirement — that adjacent blocks be merged into one. That is{" "}
+          requirement: that adjacent blocks be merged into one. That is{" "}
           <code>P3</code>, and only here does it earn its place.
         </p>
         <p className="note">
           One more consequence worth seeing: under <code>[a,b)</code>,{" "}
-          <code>M5</code> survives as well — and it deserves to. <code>M5</code>{" "}
+          <code>M5</code> survives as well, and it deserves to. <code>M5</code>{" "}
           throws away intervals whose start equals their end, and{" "}
           <code>[5,5)</code> covers no moment at all, so discarding it loses
           nothing. The same edit is a bug under one reading and correct under
@@ -591,7 +591,7 @@ export function App() {
           <h2>Shrinking a counterexample</h2>
         </div>
         <p className="note">
-          A random failure usually arrives with junk attached — fifteen
+          A random failure usually arrives with junk attached: fifteen
           intervals where two were enough. After a failure the lab repeatedly
           drops one interval and re-checks; if it still fails, the smaller case
           replaces the bigger one. What survives is the smallest input that
@@ -622,7 +622,7 @@ export function App() {
 
       <footer>
         Generated inputs use a seeded pseudo-random generator, so a seed and a
-        case count reproduce a run exactly — a failure found once can be found
+        case count reproduce a run exactly, so a failure found once can be found
         again. Coverage properties sample at half-steps, because a gap between
         two integer intervals is precisely where over-merging hides. The same
         specification runs in a terminal: <code>npm test</code> for the suite,{" "}
